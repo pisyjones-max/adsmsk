@@ -1,186 +1,296 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import Image from 'next/image'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { useInView } from '@/lib/useInView'
 
-const CASE_FILTERS = ['Все', 'Яндекс.Директ', 'Маркетплейсы', 'Telegram-бот', 'ВКонтакте']
+const FILTERS = ['Все', 'Яндекс.Директ', 'Маркетплейсы', 'Telegram-бот', 'ВКонтакте']
 
 const CASES = [
   {
     filter: 'Яндекс.Директ',
     niche: 'Строительные материалы',
-    image: '/img/case-1.jpg',
+    emoji: '🏗️',
     title: 'Снизили стоимость заявки в 3 раза',
-    before: { label: 'Стоимость заявки', value: '2 800 ₽' },
-    after:  { label: 'Стоимость заявки', value: '940 ₽' },
-    metric: '−66% CPL',
+    before: { label: 'CPL', value: '2 800 ₽' },
+    after:  { label: 'CPL', value: '940 ₽' },
+    metric: '−66%',
+    metricColor: '#00FF94',
     period: '2 месяца',
-    desc: 'Перенастроили Яндекс.Директ с нуля. Собрали минус-слова, переписали объявления, настроили РСЯ.',
+    desc: 'Перенастроили Директ с нуля: минус-слова, новые объявления, РСЯ.',
     href: '/cases/stroymat-direct',
+    gradient: 'linear-gradient(135deg, #FF6B35, #FF4D6D)',
   },
   {
     filter: 'Маркетплейсы',
     niche: 'Мебель и декор',
-    image: '/img/case-2.jpg',
-    title: 'Выход на Ozon: ×3 к продажам за 90 дней',
-    before: { label: 'Продаж в месяц', value: '43 шт.' },
-    after:  { label: 'Продаж в месяц', value: '187 шт.' },
-    metric: '+335% продажи',
+    emoji: '🛋️',
+    title: 'Ozon: продажи ×3 за 90 дней',
+    before: { label: 'Продаж/мес', value: '43 шт' },
+    after:  { label: 'Продаж/мес', value: '187 шт' },
+    metric: '+335%',
+    metricColor: '#00FF94',
     period: '3 месяца',
-    desc: 'SEO карточек, профессиональный контент, настройка рекламы на Ozon, юнит-экономика.',
+    desc: 'SEO карточек, инфографика, реклама внутри Ozon, юнит-экономика.',
     href: '/cases/novation-ozon',
+    gradient: 'linear-gradient(135deg, #A855F7, #EC4899)',
   },
   {
     filter: 'Telegram-бот',
     niche: 'Услуги красоты',
-    image: '/img/case-3.jpg',
-    title: 'Telegram-бот заменил двух администраторов',
+    emoji: '💅',
+    title: 'Бот заменил двух администраторов',
     before: { label: 'Конверсия в запись', value: '12%' },
     after:  { label: 'Конверсия в запись', value: '34%' },
-    metric: '+183% конверсия',
+    metric: '+183%',
+    metricColor: '#00FF94',
     period: '1 месяц',
-    desc: 'Разработали бота: запись, консультация, напоминания, интеграция с CRM. Работает 24/7.',
+    desc: 'Бот для записи, напоминания, CRM-интеграция. Работает 24/7.',
     href: '/cases/beauty-bot',
+    gradient: 'linear-gradient(135deg, #00D4FF, #0088FF)',
   },
   {
     filter: 'ВКонтакте',
     niche: 'Интернет-магазин одежды',
-    image: '/img/case-4.jpg',
-    title: 'ВКонтакте Ads: 890 заявок за месяц',
-    before: { label: 'Заявок в месяц', value: '45' },
-    after:  { label: 'Заявок в месяц', value: '890' },
+    emoji: '👗',
+    title: '890 заявок за месяц из ВКонтакте',
+    before: { label: 'Заявок/мес', value: '45' },
+    after:  { label: 'Заявок/мес', value: '890' },
     metric: 'CPL — 180 ₽',
+    metricColor: '#00D4FF',
     period: '1 месяц',
-    desc: 'Настроили таргет ВКонтакте, создали креативы, построили воронку через сообщения группы.',
+    desc: 'Аудитории, воронка через сообщения группы, конвертирующие креативы.',
     href: '/cases/fashion-vk',
+    gradient: 'linear-gradient(135deg, #4A90D9, #6C47FF)',
   },
   {
     filter: 'Маркетплейсы',
     niche: 'Электроника',
-    image: '/img/case-5.jpg',
-    title: 'Фотоэпиляторы на Ozon: выход в топ-10',
+    emoji: '⚡',
+    title: 'Фотоэпиляторы: топ-7 на Ozon',
     before: { label: 'Позиция', value: 'Топ-100' },
     after:  { label: 'Позиция', value: 'Топ-7' },
     metric: '+240% выручка',
+    metricColor: '#00FF94',
     period: '2 месяца',
-    desc: 'SEO карточек, 3D-фото, видео-обзор, запуск рекламы внутри маркетплейса.',
+    desc: 'SEO, 3D-фото, видео, реклама маркетплейса. Рост в 3,4 раза.',
     href: '/cases/epilator-ozon',
+    gradient: 'linear-gradient(135deg, #FFB547, #FF6B35)',
   },
 ]
 
 export function Cases() {
-  const [activeFilter, setActiveFilter] = useState('Все')
+  const [active, setActive] = useState('Все')
   const ref = useRef<HTMLElement>(null)
-  const isInView = useInView(ref)
+  const [visible, setVisible] = useState(false)
 
-  const filtered = activeFilter === 'Все'
-    ? CASES
-    : CASES.filter((c) => c.filter === activeFilter)
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } },
+      { threshold: 0.05 }
+    )
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
+
+  const filtered = active === 'Все' ? CASES : CASES.filter((c) => c.filter === active)
 
   return (
-    <section ref={ref} id="cases" className="py-20 lg:py-28 bg-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Заголовок */}
-        <div className={`text-center max-w-2xl mx-auto mb-12 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="inline-block text-sm font-semibold text-brand-primary uppercase tracking-widest mb-3">
-            Результаты наших клиентов
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-gray-900 mb-4">
-            Кейсы с реальными цифрами
+    <section
+      ref={ref}
+      id="cases"
+      className="py-24"
+      style={{
+        background: `
+          radial-gradient(ellipse 50% 60% at 90% 20%, rgba(0,212,255,0.07) 0%, transparent 60%),
+          #04030D
+        `,
+      }}
+    >
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div
+          className="text-center max-w-2xl mx-auto mb-12"
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'none' : 'translateY(24px)',
+            transition: 'all 0.6s cubic-bezier(0.16,1,0.3,1)',
+          }}
+        >
+          <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: '#00D4FF' }}>
+            Реальные результаты
+          </p>
+          <h2 className="font-display text-white mb-4" style={{ fontSize: 'clamp(32px, 5vw, 52px)' }}>
+            Кейсы с{' '}
+            <span style={{
+              background: 'linear-gradient(135deg, #8B6FFF, #00D4FF)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              цифрами
+            </span>
           </h2>
-          <p className="text-lg text-gray-600">
-            Не обещаем — показываем. Вот что произошло с бизнесом наших клиентов.
+          <p style={{ color: 'rgba(232,230,255,0.50)' }}>
+            Не обещания — конкретные результаты наших клиентов
           </p>
         </div>
 
         {/* Фильтр */}
         <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {CASE_FILTERS.map((f) => (
+          {FILTERS.map((f) => (
             <button
               key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                ${activeFilter === f
-                  ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/30'
-                  : 'bg-white text-gray-600 border border-gray-200 hover:border-brand-primary/50'}`}
+              onClick={() => setActive(f)}
+              className="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200"
+              style={active === f ? {
+                background: 'linear-gradient(135deg, #6C47FF, #00D4FF)',
+                color: '#fff',
+                boxShadow: '0 4px 20px rgba(108,71,255,0.40)',
+              } : {
+                background: 'rgba(255,255,255,0.05)',
+                color: 'rgba(232,230,255,0.55)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
             >
               {f}
             </button>
           ))}
         </div>
 
-        {/* Грид кейсов */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Сетка кейсов */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((c, i) => (
             <Link
               key={c.title}
               href={c.href}
-              className={`group bg-white rounded-2xl overflow-hidden border border-gray-200
-                         hover:border-brand-primary/40 hover:shadow-xl
-                         transition-all duration-400
-                         ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-              style={{ transitionDelay: `${i * 80}ms` }}
+              className="group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(32px)',
+                transition: `opacity 0.5s ${i * 0.08}s cubic-bezier(0.16,1,0.3,1),
+                             transform 0.5s ${i * 0.08}s cubic-bezier(0.16,1,0.3,1),
+                             box-shadow 0.3s`,
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 20px 60px rgba(0,0,0,0.50), 0 0 0 1px rgba(108,71,255,0.25)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(108,71,255,0.30)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow = 'none'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'
+              }}
             >
-              {/* Изображение */}
-              <div className="relative h-48 overflow-hidden bg-gray-100">
-                <Image
-                  src={c.image}
-                  alt={c.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              {/* Шапка карточки */}
+              <div
+                className="relative p-6 pb-4 flex items-start justify-between"
+                style={{ background: `${c.gradient.replace('linear-gradient(135deg, ', '').split(',')[0].trim()}12` }}
+              >
+                {/* Градиентная полоска сверху */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-0.5"
+                  style={{ background: c.gradient }}
                 />
-                <div className="absolute top-3 left-3 flex gap-2">
-                  <span className="bg-brand-primary text-white text-xs font-bold px-2 py-1 rounded-lg">
-                    {c.filter}
+                <div>
+                  <span
+                    className="inline-block text-xs font-bold px-2.5 py-1 rounded-lg mb-3"
+                    style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(232,230,255,0.60)' }}
+                  >
+                    {c.filter} · {c.niche}
                   </span>
-                  <span className="bg-white/90 text-gray-700 text-xs font-medium px-2 py-1 rounded-lg">
-                    {c.niche}
-                  </span>
+                  <h3 className="text-base font-bold text-white leading-snug">
+                    {c.title}
+                  </h3>
                 </div>
-                <div className="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
-                  {c.metric}
+                <span className="text-3xl flex-shrink-0 ml-3">{c.emoji}</span>
+              </div>
+
+              {/* Было / Стало */}
+              <div className="px-6 py-4 grid grid-cols-2 gap-3">
+                <div
+                  className="rounded-xl p-3 text-center"
+                  style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.15)' }}
+                >
+                  <p className="text-xs font-bold mb-1" style={{ color: '#FF4D6D' }}>БЫЛО</p>
+                  <p className="text-xs mb-1" style={{ color: 'rgba(232,230,255,0.45)' }}>{c.before.label}</p>
+                  <p className="text-lg font-bold" style={{ color: '#FF4D6D' }}>{c.before.value}</p>
+                </div>
+                <div
+                  className="rounded-xl p-3 text-center"
+                  style={{ background: 'rgba(0,255,148,0.06)', border: '1px solid rgba(0,255,148,0.15)' }}
+                >
+                  <p className="text-xs font-bold mb-1" style={{ color: '#00FF94' }}>СТАЛО</p>
+                  <p className="text-xs mb-1" style={{ color: 'rgba(232,230,255,0.45)' }}>{c.after.label}</p>
+                  <p className="text-lg font-bold" style={{ color: '#00FF94' }}>{c.after.value}</p>
                 </div>
               </div>
 
-              {/* Контент */}
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-brand-primary transition-colors">
-                  {c.title}
-                </h3>
+              {/* Описание */}
+              <div className="px-6 pb-4 flex-1">
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(232,230,255,0.50)' }}>
+                  {c.desc}
+                </p>
+              </div>
 
-                {/* Было / стало */}
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-red-50 rounded-xl p-3 text-center">
-                    <p className="text-xs text-red-500 font-medium mb-1">БЫЛО</p>
-                    <p className="text-xs text-gray-500">{c.before.label}</p>
-                    <p className="text-lg font-bold text-red-600">{c.before.value}</p>
-                  </div>
-                  <div className="bg-green-50 rounded-xl p-3 text-center">
-                    <p className="text-xs text-green-500 font-medium mb-1">СТАЛО</p>
-                    <p className="text-xs text-gray-500">{c.after.label}</p>
-                    <p className="text-lg font-bold text-green-600">{c.after.value}</p>
-                  </div>
-                </div>
-
-                <p className="text-gray-500 text-sm mb-4 leading-relaxed">{c.desc}</p>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">⏱ {c.period}</span>
-                  <span className="text-brand-primary text-sm font-semibold flex items-center gap-1
-                                  group-hover:gap-2 transition-all">
-                    Читать кейс
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
-                    </svg>
+              {/* Футер карточки */}
+              <div
+                className="px-6 py-4 flex items-center justify-between"
+                style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className="text-sm font-bold"
+                    style={{ color: c.metricColor }}
+                  >
+                    {c.metric}
+                  </span>
+                  <span className="text-xs" style={{ color: 'rgba(232,230,255,0.30)' }}>
+                    · {c.period}
                   </span>
                 </div>
+                <span
+                  className="text-sm font-semibold flex items-center gap-1 transition-gap duration-200"
+                  style={{ color: '#8B6FFF' }}
+                >
+                  Кейс
+                  <svg
+                    className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+                  </svg>
+                </span>
               </div>
             </Link>
           ))}
+        </div>
+
+        {/* CTA */}
+        <div
+          className="text-center mt-12"
+          style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.6s 0.5s' }}
+        >
+          <Link
+            href="/cases"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold
+                       transition-all duration-200"
+            style={{
+              background: 'rgba(108,71,255,0.12)',
+              border: '1px solid rgba(108,71,255,0.25)',
+              color: '#A594FF',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(108,71,255,0.20)'
+              ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(108,71,255,0.45)'
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(108,71,255,0.12)'
+              ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(108,71,255,0.25)'
+            }}
+          >
+            Смотреть все кейсы →
+          </Link>
         </div>
       </div>
     </section>

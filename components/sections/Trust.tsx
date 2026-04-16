@@ -1,105 +1,151 @@
 'use client'
 
-import { useRef } from 'react'
-import { useInView } from '@/lib/useInView'
+import { useRef, useEffect, useState } from 'react'
 
 const REVIEWS = [
   {
-    name: 'Алексей Петров',
-    role: 'Владелец стройматериалов',
+    name: 'Алексей П.',
+    role: 'Стройматериалы',
     avatar: 'АП',
     rating: 5,
-    text: 'Запустили Яндекс.Директ за 3 дня. Стоимость заявки упала с 2800 до 940 рублей. Каждый месяц отчёт с цифрами — видно, что работают честно.',
+    text: 'Директ запустили за 3 дня. CPL упал с 2800 до 940 рублей. Каждую неделю отчёт с реальными цифрами — никакой воды.',
     service: 'Яндекс.Директ',
-    color: 'from-orange-400 to-red-500',
+    color: '#FF6B35',
   },
   {
-    name: 'Марина Козлова',
-    role: 'Владелица студии красоты',
+    name: 'Марина К.',
+    role: 'Студия красоты',
     avatar: 'МК',
     rating: 5,
-    text: 'Telegram-бот заменил двух администраторов. Конверсия в запись выросла на 67%. Окупился за первый месяц. Рекомендую всем, у кого много входящих обращений.',
+    text: 'Telegram-бот окупился за первый месяц. Конверсия в запись +67%, два администратора теперь занимаются другим.',
     service: 'Telegram-бот',
-    color: 'from-cyan-400 to-blue-500',
+    color: '#00D4FF',
   },
   {
-    name: 'Сергей Волков',
-    role: 'Продавец на Wildberries',
+    name: 'Сергей В.',
+    role: 'Wildberries-продавец',
     avatar: 'СВ',
     rating: 5,
-    text: 'Вышли на Ozon с нуля — через 2 месяца уже 187 продаж в месяц. Сделали карточки, SEO, запустили рекламу. Результат превзошёл ожидания.',
-    service: 'Wildberries / Ozon',
-    color: 'from-purple-400 to-pink-500',
+    text: 'Вышли на Ozon с нуля. Через 90 дней — 187 продаж в месяц вместо 43. Сделали карточки, SEO и рекламу.',
+    service: 'Маркетплейсы',
+    color: '#A855F7',
   },
   {
-    name: 'Ирина Тарасова',
-    role: 'Интернет-магазин одежды',
+    name: 'Ирина Т.',
+    role: 'Интернет-магазин',
     avatar: 'ИТ',
     rating: 5,
-    text: 'Таргет ВКонтакте дал 890 заявок за первый месяц по 180 рублей каждая. До этого мы платили 1200-1500 за заявку у другого агентства.',
-    service: 'Реклама ВКонтакте',
-    color: 'from-blue-400 to-indigo-500',
+    text: '890 заявок в первый месяц по 180 рублей. До этого у другого агентства платили 1500 за заявку.',
+    service: 'Реклама ВК',
+    color: '#4A90D9',
   },
 ]
 
 const GUARANTEES = [
-  { icon: '📈', title: 'Гарантия результата', desc: 'Прописываем KPI в договоре. Не выполнили — компенсируем.' },
-  { icon: '📊', title: 'Прозрачная аналитика', desc: 'Еженедельные отчёты с реальными цифрами. Вы видите всё.' },
-  { icon: '⚡', title: 'Запуск за 3 дня', desc: 'Первые заявки уже через 72 часа после старта. Не 2 недели.' },
-  { icon: '🔒', title: 'Без скрытых платежей', desc: 'Фиксированная стоимость. Никаких сюрпризов в конце месяца.' },
+  { icon: '📈', title: 'KPI в договоре',        desc: 'Прописываем цели. Не выполнили — компенсируем.' },
+  { icon: '📊', title: 'Еженедельные отчёты',    desc: 'Реальные цифры без воды и приукрашивания.' },
+  { icon: '⚡', title: 'Запуск за 72 часа',      desc: 'Первые заявки через 3 дня после старта.' },
+  { icon: '🔒', title: 'Фиксированная цена',     desc: 'Никаких скрытых платежей в конце месяца.' },
 ]
 
 export function Trust() {
   const ref = useRef<HTMLElement>(null)
-  const isInView = useInView(ref)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } },
+      { threshold: 0.05 }
+    )
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
 
   return (
-    <section ref={ref} className="py-20 lg:py-28 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Заголовок */}
-        <div className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <span className="inline-block text-sm font-semibold text-brand-primary uppercase tracking-widest mb-3">
-            Почему нам доверяют
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-gray-900">
-            120 клиентов. Реальные отзывы.
+    <section
+      ref={ref}
+      className="py-24"
+      style={{ background: '#080718' }}
+    >
+      <div className="container mx-auto px-4">
+        {/* Header */}
+        <div
+          className="text-center max-w-xl mx-auto mb-14"
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'none' : 'translateY(24px)',
+            transition: 'all 0.6s cubic-bezier(0.16,1,0.3,1)',
+          }}
+        >
+          <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: '#00FF94' }}>
+            Социальное доказательство
+          </p>
+          <h2 className="font-display text-white" style={{ fontSize: 'clamp(28px, 4vw, 46px)' }}>
+            120 клиентов.<br/>
+            <span style={{
+              background: 'linear-gradient(135deg, #8B6FFF, #00FF94)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              Реальные отзывы.
+            </span>
           </h2>
         </div>
 
         {/* Отзывы */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
           {REVIEWS.map((r, i) => (
             <div
               key={i}
-              className={`flex flex-col p-6 rounded-2xl bg-gray-50 border border-gray-200
-                         hover:shadow-lg transition-all duration-300
-                         ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-              style={{ transitionDelay: `${i * 80}ms` }}
+              className="flex flex-col p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1"
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateY(0)' : 'translateY(32px)',
+                transition: `opacity 0.5s ${i * 0.08}s cubic-bezier(0.16,1,0.3,1),
+                             transform 0.5s ${i * 0.08}s cubic-bezier(0.16,1,0.3,1),
+                             border-color 0.3s`,
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = `${r.color}44`
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'
+              }}
             >
-              {/* Аватар + имя */}
+              {/* Автор */}
               <div className="flex items-center gap-3 mb-4">
-                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${r.color} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}>
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
+                  style={{ background: `${r.color}33`, border: `1px solid ${r.color}55` }}
+                >
                   {r.avatar}
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900 text-sm">{r.name}</p>
-                  <p className="text-gray-500 text-xs">{r.role}</p>
+                  <p className="text-sm font-bold text-white">{r.name}</p>
+                  <p className="text-xs" style={{ color: 'rgba(232,230,255,0.45)' }}>{r.role}</p>
                 </div>
               </div>
 
               {/* Звёзды */}
               <div className="flex gap-0.5 mb-3">
                 {[...Array(r.rating)].map((_, j) => (
-                  <svg key={j} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                  <svg key={j} className="w-3.5 h-3.5 fill-current text-yellow-400" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                   </svg>
                 ))}
               </div>
 
-              <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-4">«{r.text}»</p>
+              <p className="text-sm leading-relaxed flex-1 mb-4" style={{ color: 'rgba(232,230,255,0.60)' }}>
+                «{r.text}»
+              </p>
 
-              <span className={`inline-block text-xs font-bold px-2 py-1 rounded-lg bg-gradient-to-r ${r.color} text-white w-fit`}>
+              <span
+                className="inline-block text-xs font-bold px-2.5 py-1 rounded-lg w-fit"
+                style={{ background: `${r.color}15`, color: r.color, border: `1px solid ${r.color}30` }}
+              >
                 {r.service}
               </span>
             </div>
@@ -107,17 +153,29 @@ export function Trust() {
         </div>
 
         {/* Гарантии */}
-        <div className={`bg-gradient-to-br from-brand-dark to-brand-dark-2 rounded-3xl p-8 lg:p-12
-                        transition-all duration-700 delay-200 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h3 className="text-2xl font-extrabold text-white text-center mb-10 font-display">
+        <div
+          className="rounded-3xl p-8 lg:p-12"
+          style={{
+            background: 'linear-gradient(145deg, rgba(108,71,255,0.10), rgba(0,212,255,0.05))',
+            border: '1px solid rgba(108,71,255,0.20)',
+            opacity: visible ? 1 : 0,
+            transition: 'opacity 0.6s 0.4s',
+          }}
+        >
+          <h3
+            className="font-display text-white text-center mb-10"
+            style={{ fontSize: 'clamp(22px, 3vw, 32px)' }}
+          >
             Наши гарантии
           </h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {GUARANTEES.map((g, i) => (
-              <div key={i} className="text-center p-4">
-                <div className="text-4xl mb-4">{g.icon}</div>
-                <h4 className="text-white font-bold mb-2">{g.title}</h4>
-                <p className="text-gray-400 text-sm leading-relaxed">{g.desc}</p>
+              <div key={i} className="text-center">
+                <div className="text-4xl mb-3">{g.icon}</div>
+                <h4 className="font-bold text-white mb-2 text-sm">{g.title}</h4>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(232,230,255,0.50)' }}>
+                  {g.desc}
+                </p>
               </div>
             ))}
           </div>

@@ -1,4 +1,5 @@
 import { Hero }       from '@/components/sections/Hero'
+import { Metrics }    from '@/components/sections/Metrics'
 import { PainPoints } from '@/components/sections/PainPoints'
 import { Services }   from '@/components/sections/Services'
 import { Process }    from '@/components/sections/Process'
@@ -11,9 +12,7 @@ import { Footer }     from '@/components/layout/Footer'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'AdsMsk — Приводим клиентов и автоматизируем продажи | Москва',
-  description:
-    'Digital-агентство AdsMsk: Яндекс.Директ, реклама ВКонтакте, Telegram-боты, Wildberries/Ozon, сайты. 120+ проектов. Бесплатный разбор вашего бизнеса.',
+  title: 'AdsMsk — Трафик. Автоматизация. Рост продаж.',
   alternates: { canonical: 'https://ads.msk.ru' },
 }
 
@@ -21,6 +20,7 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <Metrics />
       <PainPoints />
       <Services />
       <Process />

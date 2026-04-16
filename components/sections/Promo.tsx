@@ -1,35 +1,30 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { Button } from '@/components/ui/Button'
-
-function getNextDeadline(): Date {
-  const now = new Date()
-  // Конец ближайшего четверга
-  const day = now.getDay()
-  const daysUntilThursday = (4 - day + 7) % 7 || 7
-  const deadline = new Date(now)
-  deadline.setDate(now.getDate() + daysUntilThursday)
-  deadline.setHours(23, 59, 59, 999)
-  return deadline
-}
 
 function pad(n: number) { return String(n).padStart(2, '0') }
 
+function getDeadline(): Date {
+  const d = new Date()
+  const daysUntilThursday = (4 - d.getDay() + 7) % 7 || 7
+  d.setDate(d.getDate() + daysUntilThursday)
+  d.setHours(23, 59, 59, 999)
+  return d
+}
+
 export function Promo() {
-  const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 })
-  const [spotsLeft] = useState(3) // можно брать из API
-  const deadlineRef = useRef(getNextDeadline())
+  const deadlineRef = useRef(getDeadline())
+  const [t, setT] = useState({ d: 0, h: 0, m: 0, s: 0 })
+  const [spots] = useState(3)
 
   useEffect(() => {
     const tick = () => {
-      const now = Date.now()
-      let diff = deadlineRef.current.getTime() - now
+      let diff = deadlineRef.current.getTime() - Date.now()
       if (diff <= 0) {
-        deadlineRef.current = getNextDeadline()
+        deadlineRef.current = getDeadline()
         diff = deadlineRef.current.getTime() - Date.now()
       }
-      setTimeLeft({
+      setT({
         d: Math.floor(diff / 86400000),
         h: Math.floor((diff % 86400000) / 3600000),
         m: Math.floor((diff % 3600000) / 60000),
@@ -41,58 +36,115 @@ export function Promo() {
     return () => clearInterval(id)
   }, [])
 
+  const segments = [
+    { v: t.d, l: 'дн' },
+    { v: t.h, l: 'ч'  },
+    { v: t.m, l: 'мин'},
+    { v: t.s, l: 'сек'},
+  ]
+
   return (
-    <section className="py-8 bg-gray-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden bg-gradient-to-r from-brand-dark to-brand-dark-3 rounded-3xl p-8 lg:p-12">
-          {/* Фоновый паттерн */}
-          <div className="absolute inset-0 opacity-10"
+    <section className="py-10" style={{ background: '#04030D' }}>
+      <div className="container mx-auto px-4">
+        <div
+          className="relative overflow-hidden rounded-3xl p-8 lg:p-12"
+          style={{
+            background: 'linear-gradient(135deg, #0E0C22 0%, #16103A 100%)',
+            border: '1px solid rgba(108,71,255,0.25)',
+          }}
+        >
+          {/* Фоновые блобы */}
+          <div
+            className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: 'radial-gradient(circle at 25% 50%, #6640ff 0%, transparent 50%), radial-gradient(circle at 75% 50%, #06B6D4 0%, transparent 50%)',
+              background: `
+                radial-gradient(ellipse 50% 80% at 0% 50%, rgba(108,71,255,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 30% 60% at 100% 50%, rgba(0,212,255,0.10) 0%, transparent 60%)
+              `,
             }}
           />
 
           <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-            {/* Левая часть */}
+            {/* Left */}
             <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-red-500/20 border border-red-500/30 rounded-full px-4 py-1.5 mb-4">
-                <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-                <span className="text-red-400 text-sm font-bold uppercase tracking-wide">
-                  Осталось {spotsLeft} места
-                </span>
+              <div
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4"
+                style={{
+                  background: 'rgba(255,77,109,0.15)',
+                  border: '1px solid rgba(255,77,109,0.30)',
+                  color: '#FF4D6D',
+                }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ background: '#FF4D6D', animation: 'pulseGlow 1.5s ease-in-out infinite' }}
+                />
+                Осталось {spots} места на этой неделе
               </div>
-              <h2 className="text-3xl lg:text-4xl font-extrabold text-white font-display mb-3">
-                Скидка 25% на первый месяц
+              <h2
+                className="font-display text-white mb-3"
+                style={{ fontSize: 'clamp(26px, 4vw, 42px)' }}
+              >
+                Скидка{' '}
+                <span style={{
+                  background: 'linear-gradient(135deg, #FFB547, #FF6B35)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>
+                  25%
+                </span>{' '}
+                на первый месяц
               </h2>
-              <p className="text-gray-300 text-lg max-w-lg">
+              <p style={{ color: 'rgba(232,230,255,0.55)', maxWidth: '420px' }}>
                 Новым клиентам — скидка 25% на любую услугу.
                 Начните получать заявки уже через 72 часа.
               </p>
             </div>
 
-            {/* Таймер */}
+            {/* Right — таймер */}
             <div className="text-center flex-shrink-0">
-              <p className="text-gray-400 text-sm uppercase tracking-widest mb-4">До конца акции</p>
-              <div className="flex items-center gap-3">
-                {[
-                  { v: timeLeft.d, l: 'дн' },
-                  { v: timeLeft.h, l: 'ч' },
-                  { v: timeLeft.m, l: 'мин' },
-                  { v: timeLeft.s, l: 'сек' },
-                ].map((t, i) => (
+              <p
+                className="text-xs uppercase tracking-widest mb-4 font-semibold"
+                style={{ color: 'rgba(232,230,255,0.35)' }}
+              >
+                До конца акции
+              </p>
+
+              <div className="flex items-center gap-2 mb-6">
+                {segments.map((seg, i) => (
                   <div key={i} className="flex flex-col items-center">
-                    <div className="w-16 h-16 bg-white/10 border border-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                      <span className="text-2xl font-extrabold text-white tabular-nums">{pad(t.v)}</span>
+                    <div
+                      className="w-16 h-16 rounded-2xl flex items-center justify-center font-display text-2xl text-white"
+                      style={{
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {pad(seg.v)}
                     </div>
-                    <span className="text-gray-400 text-xs mt-1">{t.l}</span>
+                    <span
+                      className="text-xs mt-1.5 font-medium"
+                      style={{ color: 'rgba(232,230,255,0.35)' }}
+                    >
+                      {seg.l}
+                    </span>
                   </div>
                 ))}
               </div>
-              <div className="mt-6">
-                <Button href="#lead-form" variant="accent" size="lg">
-                  Забронировать скидку →
-                </Button>
-              </div>
+
+              <a
+                href="#lead-form"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-bold text-white
+                           text-base transition-all duration-300 hover:opacity-90 hover:-translate-y-0.5"
+                style={{
+                  background: 'linear-gradient(135deg, #6C47FF, #00D4FF)',
+                  boxShadow: '0 8px 32px rgba(108,71,255,0.45)',
+                }}
+              >
+                Забронировать скидку →
+              </a>
             </div>
           </div>
         </div>

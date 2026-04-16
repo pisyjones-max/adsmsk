@@ -1,273 +1,348 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 
-const STATS = [
-  { value: '120+', label: 'проектов' },
-  { value: '4.9',  label: 'рейтинг' },
-  { value: '80%',  label: 'рутины автоматизируем' },
-  { value: '3×',   label: 'рост заявок в среднем' },
-]
+const TYPED_WORDS = ['клиентов', 'заявки', 'продажи', 'выручку']
 
 export function Hero() {
-  const heroRef = useRef<HTMLElement>(null)
+  const [wordIdx, setWordIdx] = useState(0)
+  const [displayed, setDisplayed] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const tickRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  /* Typewriter */
   useEffect(() => {
-    const el = heroRef.current
-    if (!el || window.innerWidth < 1024) return
-    const handleMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth  - 0.5) * 20
-      const y = (e.clientY / window.innerHeight - 0.5) * 10
-      el.style.setProperty('--px', `${x}px`)
-      el.style.setProperty('--py', `${y}px`)
+    const word = TYPED_WORDS[wordIdx]
+    if (!deleting && displayed.length < word.length) {
+      tickRef.current = setTimeout(() => setDisplayed(word.slice(0, displayed.length + 1)), 80)
+    } else if (!deleting && displayed.length === word.length) {
+      tickRef.current = setTimeout(() => setDeleting(true), 2000)
+    } else if (deleting && displayed.length > 0) {
+      tickRef.current = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 45)
+    } else if (deleting && displayed.length === 0) {
+      setDeleting(false)
+      setWordIdx((i) => (i + 1) % TYPED_WORDS.length)
     }
-    window.addEventListener('mousemove', handleMove)
-    return () => window.removeEventListener('mousemove', handleMove)
-  }, [])
+    return () => { if (tickRef.current) clearTimeout(tickRef.current) }
+  }, [displayed, deleting, wordIdx])
 
   return (
     <section
-      ref={heroRef}
       id="home"
       className="relative min-h-screen flex items-center overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 50%, #282868 100%)',
+        background: `
+          radial-gradient(ellipse 80% 60% at 50% -10%, rgba(108,71,255,0.28) 0%, transparent 65%),
+          radial-gradient(ellipse 50% 40% at 90% 50%, rgba(0,212,255,0.14) 0%, transparent 60%),
+          radial-gradient(ellipse 30% 30% at 10% 80%, rgba(108,71,255,0.10) 0%, transparent 50%),
+          #04030D
+        `,
       }}
     >
-      {/* Декоративные блобы */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-20"
-             style={{ background: '#4F46E5' }} />
-        <div className="absolute top-1/2 -left-20 w-72 h-72 rounded-full blur-3xl opacity-15"
-             style={{ background: '#7C3AED', animationDelay: '1s' }} />
-        <div className="absolute bottom-20 right-1/3 w-48 h-48 rounded-full blur-2xl opacity-10"
-             style={{ background: '#06B6D4', animationDelay: '2s' }} />
-        {/* Сетка */}
+      {/* Grid фон */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)
+          `,
+          backgroundSize: '72px 72px',
+        }}
+      />
+
+      {/* Орбы */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute inset-0 opacity-5"
+          className="absolute rounded-full"
           style={{
-            backgroundImage:
-              'linear-gradient(rgba(255,255,255,.3) 1px, transparent 1px),' +
-              'linear-gradient(90deg, rgba(255,255,255,.3) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
+            width: '600px', height: '600px',
+            top: '-200px', left: '50%', transform: 'translateX(-30%)',
+            background: 'radial-gradient(circle, rgba(108,71,255,0.18) 0%, transparent 70%)',
+            animation: 'float 10s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: '400px', height: '400px',
+            bottom: '-100px', right: '-100px',
+            background: 'radial-gradient(circle, rgba(0,212,255,0.12) 0%, transparent 70%)',
+            animation: 'float 13s ease-in-out infinite reverse',
           }}
         />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-20 lg:py-0">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div
+        className="container mx-auto px-4 sm:px-6 relative z-10"
+        style={{ paddingTop: '120px', paddingBottom: '80px' }}
+      >
+        <div className="max-w-4xl mx-auto text-center">
 
-          {/* LEFT */}
-          <div style={{ animation: 'fadeUp 0.6s ease forwards' }}>
-            {/* Статус-бейдж */}
-            <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 border"
-                 style={{
-                   background: 'rgba(79,70,229,0.2)',
-                   borderColor: 'rgba(79,70,229,0.3)',
-                 }}>
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-green-400 text-sm font-medium">
-                Работаем с 2020 · Москва и вся РФ
-              </span>
-            </div>
+          {/* Статус-pill */}
+          <div
+            className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-8 text-sm font-medium"
+            style={{
+              background: 'rgba(108,71,255,0.15)',
+              border: '1px solid rgba(108,71,255,0.35)',
+              color: '#A594FF',
+              animation: 'fadeIn 0.5s ease both',
+            }}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{
+                background: '#00FF94',
+                boxShadow: '0 0 8px #00FF94',
+                animation: 'pulseGlow 2s ease-in-out infinite',
+              }}
+            />
+            120+ проектов · Москва и вся РФ · Работаем с 2020
+          </div>
 
-            {/* H1 */}
-            <h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6"
-              style={{ fontFamily: 'var(--font-manrope), system-ui, sans-serif' }}
+          {/* H1 */}
+          <h1
+            className="font-display mb-6 leading-none"
+            style={{
+              fontSize: 'clamp(42px, 7vw, 88px)',
+              letterSpacing: '-0.03em',
+              animation: 'fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both',
+            }}
+          >
+            <span className="block text-white">Приводим</span>
+            <span
+              className="block"
+              style={{
+                background: 'linear-gradient(135deg, #8B6FFF 0%, #00D4FF 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                minHeight: '1.2em',
+              }}
             >
-              Приводим{' '}
+              {displayed}
               <span
-                className="relative"
                 style={{
-                  background: 'linear-gradient(90deg, #4F46E5, #06B6D4)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  display: 'inline-block',
+                  width: '3px',
+                  height: '0.85em',
+                  background: '#6C47FF',
+                  marginLeft: '4px',
+                  verticalAlign: 'middle',
+                  animation: 'blink 1s step-end infinite',
                 }}
-              >
-                горячих клиентов
-              </span>{' '}
-              и автоматизируем продажи
-            </h1>
+              />
+            </span>
+            <span className="block text-white">и&nbsp;автоматизируем</span>
+          </h1>
 
-            {/* Подзаголовок */}
-            <p className="text-lg sm:text-xl text-gray-300 mb-8 max-w-xl leading-relaxed">
-              Яндекс.Директ, реклама ВКонтакте, Telegram-боты, Wildberries/Ozon —
-              делаем <strong className="text-white">систему</strong>, а не просто рекламу.
-              Без Google. Только актуальные каналы РФ.
-            </p>
+          {/* Подзаголовок */}
+          <p
+            className="text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
+            style={{
+              color: 'rgba(232,230,255,0.60)',
+              animation: 'fadeUp 0.6s 0.2s cubic-bezier(0.16,1,0.3,1) both',
+            }}
+          >
+            Яндекс.Директ, реклама ВКонтакте, Telegram-боты, Wildberries/Ozon.
+            Без Google — только актуальные каналы РФ.
+            Делаем <strong style={{ color: '#fff', fontWeight: 600 }}>систему</strong>, а не разовую рекламу.
+          </p>
 
-            {/* CTA */}
-            <div className="flex flex-wrap gap-4 mb-10">
-              <Link
-                href="#lead-form"
-                className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-xl text-lg
-                           hover:opacity-90 transition-opacity shadow-xl group"
+          {/* CTA группа */}
+          <div
+            className="flex flex-wrap justify-center gap-4 mb-14"
+            style={{ animation: 'fadeUp 0.6s 0.3s cubic-bezier(0.16,1,0.3,1) both' }}
+          >
+            <Link
+              href="/#lead-form"
+              className="group relative overflow-hidden inline-flex items-center gap-2
+                         px-8 py-4 rounded-2xl font-bold text-white text-base
+                         transition-all duration-300 hover:-translate-y-0.5"
+              style={{
+                background: 'linear-gradient(135deg, #6C47FF 0%, #00D4FF 100%)',
+                boxShadow: '0 0 0 0 rgba(108,71,255,0.5)',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 40px rgba(108,71,255,0.50), 0 0 0 0 transparent'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.boxShadow = '0 0 0 0 rgba(108,71,255,0.5)'
+              }}
+            >
+              {/* Shimmer слой */}
+              <span
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
                 style={{
-                  background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
-                  boxShadow: '0 10px 40px rgba(79,70,229,0.3)',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%)',
+                  animation: 'shimmer 1.5s linear infinite',
                 }}
-              >
-                <span>Получить бесплатный разбор</span>
-                <svg
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                </svg>
-              </Link>
+              />
+              <span className="relative">Получить бесплатный разбор</span>
+              <svg className="w-5 h-5 relative group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </Link>
 
-              <a
-                href="https://t.me/UR16_bot?start"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-white font-bold px-8 py-4 rounded-xl text-lg
-                           border-2 hover:bg-white/10 transition-all"
-                style={{ borderColor: 'rgba(255,255,255,0.3)' }}
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.717l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.646.869z"/>
-                </svg>
-                Написать в Telegram
-              </a>
-            </div>
+            <a
+              href="https://t.me/UR16_bot?start"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl
+                         font-bold text-white text-base transition-all duration-300
+                         hover:-translate-y-0.5"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.12)',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.10)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(108,71,255,0.50)'
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)'
+                ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'
+              }}
+            >
+              <TgIcon />
+              Написать в Telegram
+            </a>
+          </div>
 
-            {/* Social proof */}
-            <div className="flex flex-wrap items-center gap-6">
-              <div className="flex items-center gap-2">
-                <div className="flex">
+          {/* Social proof strip */}
+          <div
+            className="flex flex-wrap justify-center items-center gap-6"
+            style={{ animation: 'fadeUp 0.6s 0.4s cubic-bezier(0.16,1,0.3,1) both' }}
+          >
+            {/* Аватары */}
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-2.5">
+                {['АП','МК','СВ','ИТ','РВ'].map((abbr, i) => (
+                  <div
+                    key={i}
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white border-2"
+                    style={{
+                      background: `linear-gradient(135deg, hsl(${250 + i*20}, 70%, 55%), hsl(${200 + i*15}, 80%, 60%))`,
+                      borderColor: '#04030D',
+                      zIndex: 5 - i,
+                    }}
+                  >
+                    {abbr}
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                     </svg>
                   ))}
                 </div>
-                <span className="text-white font-semibold">4.9</span>
-                <span className="text-gray-400 text-sm">/ 120 отзывов</span>
-              </div>
-
-              <div className="w-px h-6 bg-gray-600 hidden sm:block" />
-
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {['АП', 'МК', 'СВ', 'ИТ'].map((initials, i) => (
-                    <div
-                      key={i}
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold border-2"
-                      style={{
-                        background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
-                        borderColor: '#0F0F1A',
-                      }}
-                    >
-                      {initials}
-                    </div>
-                  ))}
-                </div>
-                <span className="text-gray-300 text-sm">120+ клиентов доверяют нам</span>
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(232,230,255,0.50)' }}>
+                  4.9 из 5 · 120+ клиентов
+                </p>
               </div>
             </div>
-          </div>
 
-          {/* RIGHT — floating cards */}
-          <div className="hidden lg:block">
-            <div className="relative">
-              {/* Главный блок (заглушка если нет img) */}
-              <div
-                className="relative rounded-2xl overflow-hidden border"
-                style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-              >
-                <div
-                  className="w-full h-80 flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #1A1A2E, #282868)' }}
-                >
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">📈</div>
-                    <p className="text-white font-bold text-xl">Рост продаж</p>
-                    <p className="text-gray-400">для бизнеса в РФ</p>
-                  </div>
-                </div>
-              </div>
+            <div className="w-px h-8 hidden sm:block" style={{ background: 'rgba(255,255,255,0.10)' }} />
 
-              {/* Floating — CPL */}
-              <div
-                className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-2xl p-4"
-                style={{ animation: 'float 6s ease-in-out infinite' }}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Рост заявок</p>
-                    <p className="text-xl font-bold text-gray-900">+340%</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating — стоимость заявки */}
-              <div
-                className="absolute -top-6 -right-6 rounded-2xl shadow-2xl p-4 border"
-                style={{
-                  background: '#0F0F1A',
-                  borderColor: 'rgba(79,70,229,0.3)',
-                  animation: 'float 6s ease-in-out infinite',
-                  animationDelay: '2s',
-                }}
-              >
-                <p className="text-xs text-gray-400 mb-1">Стоимость заявки</p>
-                <div className="flex items-end gap-2">
-                  <span className="text-gray-500 line-through text-sm">2 800 ₽</span>
-                  <span className="text-green-400 font-bold text-xl">940 ₽</span>
-                </div>
-                <p className="text-xs mt-1" style={{ color: '#06B6D4' }}>Яндекс.Директ</p>
-              </div>
-            </div>
+            <p className="text-sm" style={{ color: 'rgba(232,230,255,0.50)' }}>
+              <span style={{ color: '#00FF94', fontWeight: 600 }}>↓ CPL в среднем на 65%</span>
+              {' '}за первые 60 дней
+            </p>
           </div>
         </div>
 
-        {/* Статистика */}
-        <div className="mt-16 lg:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {STATS.map((stat) => (
-            <div
-              key={stat.label}
-              className="text-center p-4 rounded-xl border backdrop-blur-sm"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                borderColor: 'rgba(255,255,255,0.1)',
-              }}
-            >
-              <p
-                className="text-3xl font-extrabold"
-                style={{
-                  fontFamily: 'var(--font-manrope), system-ui, sans-serif',
-                  background: 'linear-gradient(90deg, #4F46E5, #06B6D4)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                {stat.value}
-              </p>
-              <p className="text-gray-400 text-sm mt-1">{stat.label}</p>
-            </div>
-          ))}
+        {/* Floating cards */}
+        <div className="hidden xl:block">
+          <FloatCard
+            style={{ position: 'absolute', top: '140px', left: '0', animation: 'float 8s ease-in-out infinite' }}
+            label="Стоимость заявки"
+            before="2 800 ₽"
+            after="940 ₽"
+            badge="Яндекс.Директ"
+            positive
+          />
+          <FloatCard
+            style={{ position: 'absolute', bottom: '100px', right: '0', animation: 'float 9s 1s ease-in-out infinite reverse' }}
+            label="Продажи в месяц"
+            before="43 шт"
+            after="187 шт"
+            badge="Wildberries"
+            positive
+          />
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 animate-bounce">
-        <span className="text-xs uppercase tracking-widest">Листать</span>
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7"/>
-        </svg>
+      {/* Scroll hint */}
+      <div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        style={{ color: 'rgba(232,230,255,0.30)', animation: 'fadeIn 1s 1s both' }}
+      >
+        <span className="text-xs uppercase tracking-widest">Скролл</span>
+        <div
+          className="w-5 h-8 rounded-full border flex items-start justify-center p-1.5"
+          style={{ borderColor: 'rgba(255,255,255,0.15)' }}
+        >
+          <div
+            className="w-1 h-2 rounded-full"
+            style={{
+              background: '#6C47FF',
+              animation: 'float 1.5s ease-in-out infinite',
+            }}
+          />
+        </div>
       </div>
     </section>
+  )
+}
+
+function FloatCard({
+  style, label, before, after, badge, positive,
+}: {
+  style: React.CSSProperties
+  label: string; before: string; after: string; badge: string; positive?: boolean
+}) {
+  return (
+    <div
+      style={{
+        ...style,
+        background: 'rgba(14,12,34,0.90)',
+        backdropFilter: 'blur(24px)',
+        border: '1px solid rgba(108,71,255,0.25)',
+        borderRadius: '20px',
+        padding: '20px 24px',
+        minWidth: '200px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.50)',
+      }}
+    >
+      <p className="text-xs mb-3" style={{ color: 'rgba(232,230,255,0.40)' }}>{label}</p>
+      <div className="flex items-end gap-3 mb-3">
+        <span className="text-sm line-through" style={{ color: 'rgba(232,230,255,0.30)' }}>{before}</span>
+        <span
+          className="text-2xl font-bold font-display"
+          style={{ color: positive ? '#00FF94' : '#FF4D6D' }}
+        >
+          {after}
+        </span>
+      </div>
+      <span
+        className="inline-block px-2.5 py-1 rounded-lg text-xs font-semibold"
+        style={{ background: 'rgba(108,71,255,0.20)', color: '#A594FF' }}
+      >
+        {badge}
+      </span>
+    </div>
+  )
+}
+
+function TgIcon() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.17 13.717l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.646.869z"/>
+    </svg>
   )
 }
