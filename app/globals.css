@@ -1,14 +1,10 @@
 @import "tailwindcss";
 
-/* ════════════════════════════════════════════
-   ТОКЕНЫ ДИЗАЙНА
-════════════════════════════════════════════ */
 @theme {
-  /* --- Палитра --- */
-  --color-ink-950:    #04030D;
-  --color-ink-900:    #080718;
-  --color-ink-800:    #0E0C22;
-  --color-ink-700:    #151230;
+  --color-ink-950:     #04030D;
+  --color-ink-900:     #080718;
+  --color-ink-800:     #0E0C22;
+  --color-ink-700:     #151230;
 
   --color-violet-core: #6C47FF;
   --color-violet-soft: #8B6FFF;
@@ -20,59 +16,6 @@
   --color-green-neon:  #00FF94;
   --color-amber-warm:  #FFB547;
   --color-red-alert:   #FF4D6D;
-
-  --color-glass-white: rgba(255,255,255,0.06);
-  --color-glass-border: rgba(255,255,255,0.10);
-  --color-glass-hover:  rgba(255,255,255,0.10);
-
-  /* --- Шрифты --- */
-  --font-family-sans:    'Inter', system-ui, sans-serif;
-  --font-family-display: 'Syne', 'Inter', sans-serif;
-  --font-family-mono:    'JetBrains Mono', monospace;
-
-  /* --- Тени (glow) --- */
-  --shadow-violet: 0 0 40px rgba(108,71,255,0.35);
-  --shadow-cyan:   0 0 40px rgba(0,212,255,0.25);
-  --shadow-green:  0 0 30px rgba(0,255,148,0.20);
-
-  /* --- Анимации --- */
-  --animate-fade-up:      fadeUp 0.55s cubic-bezier(0.16,1,0.3,1) both;
-  --animate-fade-in:      fadeIn 0.4s ease both;
-  --animate-float:        float 7s ease-in-out infinite;
-  --animate-pulse-glow:   pulseGlow 2.5s ease-in-out infinite;
-  --animate-shimmer:      shimmer 2.5s linear infinite;
-  --animate-count-up:     countUp 0.8s cubic-bezier(0.16,1,0.3,1) both;
-}
-
-/* ════════════════════════════════════════════
-   КАСТОМНЫЕ УТИЛИТЫ
-════════════════════════════════════════════ */
-
-/* Стекло */
-@utility glass {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.10);
-}
-
-@utility glass-strong {
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(40px) saturate(200%);
-  -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid rgba(255,255,255,0.15);
-}
-
-@utility glass-dark {
-  background: rgba(8,7,24,0.80);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-/* Градиенты */
-@utility gradient-brand {
-  background: linear-gradient(135deg, #6C47FF 0%, #00D4FF 100%);
 }
 
 @utility gradient-brand-text {
@@ -82,107 +25,69 @@
   background-clip: text;
 }
 
-@utility gradient-hero-bg {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(108,71,255,0.25) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 90% 50%,  rgba(0,212,255,0.12)  0%, transparent 60%),
-    #04030D;
-}
-
-@utility gradient-section {
-  background:
-    radial-gradient(ellipse 60% 50% at 10% 50%, rgba(108,71,255,0.08) 0%, transparent 70%),
-    #080718;
-}
-
-@utility gradient-card {
-  background: linear-gradient(145deg, rgba(108,71,255,0.08) 0%, rgba(0,212,255,0.04) 100%);
-}
-
-/* Glow */
-@utility glow-violet {
-  box-shadow: 0 0 40px rgba(108,71,255,0.35), 0 0 80px rgba(108,71,255,0.10);
-}
-
-@utility glow-cyan {
-  box-shadow: 0 0 40px rgba(0,212,255,0.30), 0 0 80px rgba(0,212,255,0.08);
-}
-
-@utility glow-text-violet {
-  text-shadow: 0 0 30px rgba(139,111,255,0.60);
-}
-
-/* Noise overlay */
-@utility noise {
-  position: relative;
-}
-@utility noise-effect {
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.05;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  }
-}
-
-/* Сетка */
-@utility grid-bg {
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 64px 64px;
-}
-
-/* Шрифт дисплея */
 @utility font-display {
   font-family: 'Syne', 'Inter', sans-serif;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
-/* ════════════════════════════════════════════
-   KEYFRAMES
-════════════════════════════════════════════ */
+@utility glass {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+@utility glass-dark {
+  background: rgba(8, 7, 24, 0.80);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(28px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
 @keyframes float {
-  0%,100% { transform: translateY(0)    rotate(0deg); }
-  33%     { transform: translateY(-14px) rotate(0.5deg); }
-  66%     { transform: translateY(-7px)  rotate(-0.3deg); }
+  0%,  100% { transform: translateY(0px); }
+  33%        { transform: translateY(-14px); }
+  66%        { transform: translateY(-7px); }
 }
+
 @keyframes pulseGlow {
-  0%,100% { opacity: 0.6; }
-  50%     { opacity: 1; }
+  0%,  100% { opacity: 0.6; }
+  50%        { opacity: 1; }
 }
+
 @keyframes shimmer {
   0%   { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
-@keyframes borderRotate {
-  0%   { --border-angle: 0turn; }
-  100% { --border-angle: 1turn; }
-}
-@keyframes scanline {
-  0%   { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
+
 @keyframes blink {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0; }
+  0%,  100% { opacity: 1; }
+  50%        { opacity: 0; }
 }
 
-/* ════════════════════════════════════════════
-   БАЗА
-════════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@keyframes shimmerBg {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html {
   scroll-behavior: smooth;
@@ -200,32 +105,39 @@ body {
   overflow-x: hidden;
 }
 
-/* Выделение */
-::selection { background: #6C47FF; color: #fff; }
+::selection {
+  background: #6C47FF;
+  color: #fff;
+}
 
-/* Скроллбар */
 ::-webkit-scrollbar       { width: 4px; }
 ::-webkit-scrollbar-track { background: #04030D; }
 ::-webkit-scrollbar-thumb { background: #6C47FF; border-radius: 2px; }
 
-/* Focus */
-:focus-visible { outline: 2px solid #6C47FF; outline-offset: 3px; border-radius: 6px; }
+:focus-visible {
+  outline: 2px solid #6C47FF;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
 
-/* Контейнер */
-.container { width: 100%; max-width: 1200px; margin: 0 auto; }
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-/* Блокировка скролла */
-body.locked { overflow: hidden; }
-
-/* Shimmer */
-.shimmer-line {
-  position: relative;
+body.locked {
   overflow: hidden;
 }
-.shimmer-line::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-  animation: shimmer 2.5s linear infinite;
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerBg 1.5s linear infinite;
+  border-radius: 8px;
 }
