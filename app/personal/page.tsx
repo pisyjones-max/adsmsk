@@ -1,13 +1,7 @@
-import type { Metadata } from 'next'
+'use client';
+
 import Link from 'next/link'
 import { Footer } from '@/components/layout/Footer'
-
-export const metadata: Metadata = {
-  title: 'Политика обработки персональных данных | AdsMsk',
-  description: 'Политика обработки персональных данных компании AdsMsk в соответствии с ФЗ-152.',
-  alternates: { canonical: 'https://ads.msk.ru/personal' },
-  robots: { index: false, follow: false },
-}
 
 export default function PersonalPage() {
   return (
@@ -31,7 +25,7 @@ export default function PersonalPage() {
 
             {[
               {
-                title: '1. Какие данные мы собираем',
+                title: '1. Какие данные we собираем',
                 content: 'Имя, номер телефона, адрес электронной почты, Telegram-аккаунт — только данные, которые вы добровольно указываете в формах на сайте.',
               },
               {
