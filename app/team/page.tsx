@@ -1,3 +1,4 @@
+'use client';
 import type { Metadata } from 'next'
 import Link              from 'next/link'
 import { LeadForm }      from '@/components/sections/LeadForm'
